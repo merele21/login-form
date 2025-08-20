@@ -1,0 +1,37 @@
+# dev вариант
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: username # вместо xx нужно будет заменить на что-то реальное
+      POSTGRES_PASSWORD: tsunya
+      POSTGRES_DB: dbname
+    ports:
+      - "5432:5432" # нужно, если будем подключаться с хоста VM/IDE
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U username -d dbname"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379" # нужно, если будем подключаться с хоста VM/IDE
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # место для TLS и http-gateway
+
+volumes:
+  pgdata:
+  redisdata:
